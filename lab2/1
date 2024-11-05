@@ -1,0 +1,104 @@
+from tkinter import *
+from tkinter import messagebox
+from tkinter.ttk import Combobox
+
+class MyComboBox:
+    def __init__(self, list, font, x, y, width, window):
+        self.x = x
+        self.y = y
+        self.list = list
+        self.font = font
+        self.width = width
+        self.window = window
+
+        self.combobox = Combobox(window, values=self.list, font=self.font, state="readonly")
+        self.combobox.place(x=self.x, y=self.y, width=self.width)
+        self.combobox.bind("<<ComboboxSelected>>", lambda event: self.select())
+
+
+class MyButton:
+    def __init__(self, text, font, x, y, width, window):
+        self.x = x
+        self.y = y
+        self.text = text
+        self.font = font
+        self.width = width
+        self.window = window
+
+        self.button = Button(text=self.text, font=self.font, command=self.click)
+        self.button.place(x=self.x, y=self.y, width=self.width)
+
+    def click(self):
+        try:
+            count = int(self.window.entry_people.value.get())
+            heights = []
+            for i in range(count):
+                height = float(self.window.entry_height[i].value.get())
+                heights.append(height)
+
+            max_height = max(heights)
+            min_height = min(heights)
+            self.window.label_result.label.config(
+                text=f"Максимальный рост: {max_height}, Минимальный рост: {min_height}")
+        except ValueError:
+            messagebox.showerror("Ошибка", "Введите корректные числовые данные.")
+
+
+class MyEntry:
+    def __init__(self, font, x, y, width):
+        self.font = font
+        self.x = x
+        self.y = y
+        self.width = width
+        self.value = StringVar()
+
+        self.entry = Entry(textvariable=self.value, font=self.font)
+        self.entry.place(x=self.x, y=self.y, width=self.width)
+
+
+class MyLabel:
+    def __init__(self, text, font, color, x, y):
+        self.text = text
+        self.x = x
+        self.y = y
+        self.font = font
+        self.color = color
+        self.label = Label(text=self.text, font=self.font, bg=self.color)
+        self.label.place(x=self.x, y=self.y)
+
+
+class MyWindow:
+    def __init__(self):
+        self.window = Tk()
+        self.window.geometry('800x800')
+        self.window.title('Лабораторная работа 6')
+        self.window.configure(bg='blue')
+        self.window.resizable(width=False, height=False)
+
+        self.__new_label()
+        self.__new_entry()
+        self.__new_button()
+        self.__new_result_label()
+
+        self.window.mainloop()
+
+    def __new_label(self):
+        self.label_title = MyLabel("Программа", "Arial 20", "lightblue", 320, 50)
+        self.label_people = MyLabel("Количество человек:", "Arial 15", "lightblue", 50, 150)
+        self.label_height = MyLabel("Введите рост каждого человека:", "Arial 15", "lightblue", 50, 200)
+
+    def __new_entry(self):
+        self.entry_people = MyEntry("Arial 15", 400, 150, 100)
+        self.entry_people = MyEntry("Arial 15", 400, 150, 100)
+        self.entry_height = []  # Список для хранения объектов ввода роста
+        self.height_labels = MyLabel("Рост 1:", "Arial 15", "lightblue", 50, 250)
+
+    def __new_button(self):
+        self.button = MyButton("Подсчитать", "Arial 15", 250, 200, 100, self.window)
+
+    def __new_result_label(self):
+        self.label_result = MyLabel("", "Arial 15", "lightblue", 50, 350)
+
+
+# Создаем экземпляр класса
+new_window = MyWindow()
