@@ -1,17 +1,33 @@
+from art import *
+from PIL import Image
 
-import time
-import sys
-from colorama import init, Fore
+# Здесь вы можете использовать любое изображение аниме девушки.
+# Замените 'anime_girl.jpg' на путь к вашему изображению.
+image_path = 'anime_girl.jpg'
 
-# Инициализация colorama
-init(autoreset=True)
+# Параметры для преобразования
+width = 100  # Ширина ASCII-арт
+height = 100  # Высота ASCII-арт
 
-def slow_print(text, delay=0.1):
-    for char in text:
-        sys.stdout.write(char)  # Печатает один символ
-        sys.stdout.flush()       # Обновляет вывод
-        time.sleep(delay)        # Задержка перед выводом следующего символа
-    print()  # Переход на новую строку после вывода всего текста
+# Открытие изображения и преобразование его в ASCII
+img = Image.open(image_path)
+img = img.resize((width, height))
+img = img.convert('L')  # Конвертация в градации серого
 
-# Использование функции
-slow_print(Fore.GREEN + "В какую пещеру вы войдете?", delay=0.1)
+# Определение символов для представления градаций серого
+ASCII_CHARS = "@%#*+=-:. "
+
+def pixel_to_ascii(image):
+    pixels = image.getdata()
+    ascii_str = ''.join([ASCII_CHARS[pixel // 25] for pixel in pixels])
+    return ascii_str
+
+ascii_art = pixel_to_ascii(img)
+
+# Форматирование строки для вывода
+img_width, img_height = img.size
+ascii_art_lines = [ascii_art[i:i + img_width] for i in range(0, len(ascii_art), img_width)]
+
+# Вывод результата
+for line in ascii_art_lines:
+    print(line)

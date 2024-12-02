@@ -1,0 +1,377 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML
+><HEAD
+><TITLE
+>Bash, version 3</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.57"><LINK
+REL="HOME"
+TITLE="Advanced Bash-Scripting Guide"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Bash, versions 2 and 3"
+HREF="bash2.html"><LINK
+REL="PREVIOUS"
+TITLE="Bash, versions 2 and 3"
+HREF="bash2.html"><LINK
+REL="NEXT"
+TITLE="Endnotes"
+HREF="endnotes.html"><META
+HTTP-EQUIV="Content-Style-Type"
+CONTENT="text/css"><LINK
+REL="stylesheet"
+HREF="common/kde-common.css"
+TYPE="text/css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=iso-8859-1"><META
+HTTP-EQUIV="Content-Language"
+CONTENT="en"><LINK
+REL="stylesheet"
+HREF="common/kde-localised.css"
+TYPE="text/css"
+TITLE="KDE-English"><LINK
+REL="stylesheet"
+HREF="common/kde-default.css"
+TYPE="text/css"
+TITLE="KDE-Default"></HEAD
+><BODY
+CLASS="SECT1"
+BGCOLOR="#FFFFFF"
+TEXT="#000000"
+LINK="#AA0000"
+VLINK="#AA0055"
+ALINK="#AA0000"
+STYLE="font-family: sans-serif;"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="3"
+ALIGN="center"
+>Advanced Bash-Scripting Guide: An in-depth exploration of the art of shell scripting</TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="bottom"
+><A
+HREF="bash2.html"
+>Prev</A
+></TD
+><TD
+WIDTH="80%"
+ALIGN="center"
+VALIGN="bottom"
+>Chapter 34. Bash, versions 2 and 3</TD
+><TD
+WIDTH="10%"
+ALIGN="right"
+VALIGN="bottom"
+><A
+HREF="endnotes.html"
+>Next</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="BASHVER3"
+>34.2. Bash, version 3</A
+></H1
+><P
+><A
+NAME="BASH3REF"
+></A
+></P
+><P
+>On July 27, 2004, Chet Ramey released version 3 of Bash. This
+        update fixes quite a number of bug in Bash and adds some new
+	features.</P
+><P
+>Some of the added features are:
+
+      <UL
+><LI
+><P
+>A new, more generalized <B
+CLASS="COMMAND"
+>{a..z}</B
+> <A
+HREF="special-chars.html#BRACEEXPREF"
+>brace expansion</A
+> operator.
+               <TABLE
+BORDER="0"
+BGCOLOR="#E0E0E0"
+WIDTH="90%"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>   1&nbsp;#!/bin/bash
+   2&nbsp;
+   3&nbsp;for i in {1..10}
+   4&nbsp;#  Simpler and more straightforward than
+   5&nbsp;#+ for i in $(seq 10)
+   6&nbsp;do
+   7&nbsp;  echo -n "$i "
+   8&nbsp;done
+   9&nbsp;
+  10&nbsp;echo
+  11&nbsp;
+  12&nbsp;# 1 2 3 4 5 6 7 8 9 10</PRE
+></TD
+></TR
+></TABLE
+>
+
+         </P
+></LI
+><LI
+><P
+>The <B
+CLASS="COMMAND"
+>${!array[@]}</B
+> operator, which
+	    expands to all the indices of a given <A
+HREF="arrays.html#ARRAYREF"
+>array</A
+>.
+	      <TABLE
+BORDER="0"
+BGCOLOR="#E0E0E0"
+WIDTH="90%"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>   1&nbsp;#!/bin/bash
+   2&nbsp;
+   3&nbsp;Array=(element-zero element-one element-two element-three)
+   4&nbsp;
+   5&nbsp;echo ${Array[0]}   # element-zero
+   6&nbsp;                   # First element of array.
+   7&nbsp;
+   8&nbsp;echo ${!Array[@]}  # 0 1 2 3
+   9&nbsp;                   # All the indices of Array.
+  10&nbsp;
+  11&nbsp;for i in ${!Array[@]}
+  12&nbsp;do
+  13&nbsp;  echo ${Array[i]} # element-zero
+  14&nbsp;                   # element-one
+  15&nbsp;                   # element-two
+  16&nbsp;                   # element-three
+  17&nbsp;                   #
+  18&nbsp;                   # All the elements in Array.
+  19&nbsp;done</PRE
+></TD
+></TR
+></TABLE
+>
+         </P
+></LI
+><LI
+><P
+><A
+NAME="REGEXMATCHREF"
+></A
+></P
+><P
+>The <B
+CLASS="COMMAND"
+>=~</B
+> <A
+HREF="regexp.html#REGEXREF"
+>Regular
+	    Expression</A
+> matching operator within a <A
+HREF="tests.html#DBLBRACKETS"
+>double brackets</A
+> test expression.
+	    (Perl has a similar operator.)</P
+><P
+><TABLE
+BORDER="0"
+BGCOLOR="#E0E0E0"
+WIDTH="90%"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>   1&nbsp;#!/bin/bash
+   2&nbsp;
+   3&nbsp;variable="This is a fine mess."
+   4&nbsp;
+   5&nbsp;echo "$variable"
+   6&nbsp;
+   7&nbsp;if [[ "$variable" =~ "T*fin*es*" ]]
+   8&nbsp;# Regex matching with =~ operator within [[ double brackets ]].
+   9&nbsp;then
+  10&nbsp;  echo "match found"
+  11&nbsp;      # match found
+  12&nbsp;fi</PRE
+></TD
+></TR
+></TABLE
+></P
+><P
+>Or, more usefully:</P
+><P
+><TABLE
+BORDER="0"
+BGCOLOR="#E0E0E0"
+WIDTH="90%"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>   1&nbsp;#!/bin/bash
+   2&nbsp;
+   3&nbsp;input=$1
+   4&nbsp;
+   5&nbsp;
+   6&nbsp;if [[ "$input" =~ "[1-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9][0-9][0-9]" ]]
+   7&nbsp;# NNN-NN-NNNN
+   8&nbsp;# Where each N is a digit.
+   9&nbsp;# But, initial digit must not be 0.
+  10&nbsp;then
+  11&nbsp;  echo "Social Security number."
+  12&nbsp;  # Process SSN.
+  13&nbsp;else
+  14&nbsp;  echo "Not a Social Security number!"
+  15&nbsp;  # Or, ask for corrected input.
+  16&nbsp;fi</PRE
+></TD
+></TR
+></TABLE
+></P
+><P
+>For another example of using the <B
+CLASS="COMMAND"
+>=~</B
+>
+	        operator, see <A
+HREF="contributed-scripts.html#WHX"
+>Example A-28</A
+>.</P
+></LI
+></UL
+>
+      </P
+><DIV
+CLASS="CAUTION"
+><TABLE
+CLASS="CAUTION"
+WIDTH="100%"
+BORDER="0"
+><TR
+><TD
+WIDTH="25"
+ALIGN="CENTER"
+VALIGN="TOP"
+><IMG
+SRC="common/caution.png"
+HSPACE="5"
+ALT="Caution"></TD
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+><P
+>The update to version 3 of Bash breaks a few scripts
+        that worked under earlier versions. <I
+CLASS="EMPHASIS"
+>Test critical legacy
+	scripts to make sure they still work!</I
+></P
+><P
+>As it happens, a couple of the scripts in the
+        <I
+CLASS="EMPHASIS"
+>Advanced Bash Scripting Guide</I
+> had to be
+        fixed up (see <A
+HREF="contributed-scripts.html#OBJORIENTED"
+>Example A-20</A
+>
+        and <A
+HREF="variables2.html#TOUT"
+>Example 9-4</A
+>, for instance).</P
+></TD
+></TR
+></TABLE
+></DIV
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="bash2.html"
+>Prev</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+>Home</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="endnotes.html"
+>Next</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Bash, versions 2 and 3</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="bash2.html"
+>Up</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Endnotes</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

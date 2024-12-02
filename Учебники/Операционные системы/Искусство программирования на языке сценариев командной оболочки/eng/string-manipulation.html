@@ -1,0 +1,1296 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML
+><HEAD
+><TITLE
+>Manipulating Strings</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.57"><LINK
+REL="HOME"
+TITLE="Advanced Bash-Scripting Guide"
+HREF="index.html"><LINK
+REL="UP"
+TITLE="Variables Revisited"
+HREF="variables2.html"><LINK
+REL="PREVIOUS"
+TITLE="Variables Revisited"
+HREF="variables2.html"><LINK
+REL="NEXT"
+TITLE="Parameter Substitution"
+HREF="parameter-substitution.html"><META
+HTTP-EQUIV="Content-Style-Type"
+CONTENT="text/css"><LINK
+REL="stylesheet"
+HREF="common/kde-common.css"
+TYPE="text/css"><META
+HTTP-EQUIV="Content-Type"
+CONTENT="text/html; charset=iso-8859-1"><META
+HTTP-EQUIV="Content-Language"
+CONTENT="en"><LINK
+REL="stylesheet"
+HREF="common/kde-localised.css"
+TYPE="text/css"
+TITLE="KDE-English"><LINK
+REL="stylesheet"
+HREF="common/kde-default.css"
+TYPE="text/css"
+TITLE="KDE-Default"></HEAD
+><BODY
+CLASS="SECT1"
+BGCOLOR="#FFFFFF"
+TEXT="#000000"
+LINK="#AA0000"
+VLINK="#AA0055"
+ALINK="#AA0000"
+STYLE="font-family: sans-serif;"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="3"
+ALIGN="center"
+>Advanced Bash-Scripting Guide: An in-depth exploration of the art of shell scripting</TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="bottom"
+><A
+HREF="variables2.html"
+>Prev</A
+></TD
+><TD
+WIDTH="80%"
+ALIGN="center"
+VALIGN="bottom"
+>Chapter 9. Variables Revisited</TD
+><TD
+WIDTH="10%"
+ALIGN="right"
+VALIGN="bottom"
+><A
+HREF="parameter-substitution.html"
+>Next</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="STRING-MANIPULATION"
+>9.2. Manipulating Strings</A
+></H1
+><P
+><A
+NAME="STRINGMANIP"
+></A
+></P
+><P
+>Bash supports a surprising number of string manipulation
+	      operations.  Unfortunately, these tools lack
+	      a unified focus. Some are a subset of <A
+HREF="parameter-substitution.html#PARAMSUBREF"
+>parameter substitution</A
+>, and
+	      others fall under the functionality of the UNIX <A
+HREF="moreadv.html#EXPRREF"
+>expr</A
+> command. This results in
+	      inconsistent command syntax and overlap of functionality,
+	      not to mention confusion.</P
+><DIV
+CLASS="VARIABLELIST"
+><P
+><B
+>String Length</B
+></P
+><DL
+><DT
+>${#string}</DT
+><DD
+><P
+></P
+></DD
+><DT
+>expr length $string</DT
+><DD
+><P
+></P
+></DD
+><DT
+>expr "$string" : '.*'</DT
+><DD
+><P
+>	  <TABLE
+BORDER="0"
+BGCOLOR="#E0E0E0"
+WIDTH="90%"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>   1&nbsp;stringZ=abcABC123ABCabc
+   2&nbsp;
+   3&nbsp;echo ${#stringZ}                 # 15
+   4&nbsp;echo `expr length $stringZ`      # 15
+   5&nbsp;echo `expr "$stringZ" : '.*'`    # 15</PRE
+></TD
+></TR
+></TABLE
+>
+	  </P
+></DD
+></DL
+></DIV
+><DIV
+CLASS="EXAMPLE"
+><HR><A
+NAME="PARAGRAPHSPACE"
+></A
+><P
+><B
+>Example 9-10. Inserting a blank line between paragraphs in a text file</B
+></P
+><TABLE
+BORDER="0"
+BGCOLOR="#E0E0E0"
+WIDTH="100%"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>   1&nbsp;#!/bin/bash
+   2&nbsp;# paragraph-space.sh
+   3&nbsp;
+   4&nbsp;# Inserts a blank line between paragraphs of a single-spaced text file.
+   5&nbsp;# Usage: $0 &#60;FILENAME
+   6&nbsp;
+   7&nbsp;MINLEN=45        # May need to change this value.
+   8&nbsp;#  Assume lines shorter than $MINLEN characters
+   9&nbsp;#+ terminate a paragraph.
+  10&nbsp;
+  11&nbsp;while read line  # For as many lines as the input file has...
+  12&nbsp;do
+  13&nbsp;  echo "$line"   # Output the line itself.
+  14&nbsp;
+  15&nbsp;  len=${#line}
+  16&nbsp;  if [ "$len" -lt "$MINLEN" ]
+  17&nbsp;    then echo    # Add a blank line after short line.
+  18&nbsp;  fi  
+  19&nbsp;done
+  20&nbsp;
+  21&nbsp;exit 0</PRE
+></TD
+></TR
+></TABLE
+><HR></DIV
+><DIV
+CLASS="VARIABLELIST"
+><P
+><B
+>Length of Matching Substring at Beginning of String</B
+></P
+><DL
+><DT
+>expr match "$string" '$substring'</DT
+><DD
+><P
+><TT
+CLASS="REPLACEABLE"
+><I
+>$substring</I
+></TT
+> is a <A
+HREF="regexp.html#REGEXREF"
+>regular expression</A
+>.</P
+></DD
+><DT
+>expr "$string" : '$substring'</DT
+><DD
+><P
+><TT
+CLASS="REPLACEABLE"
+><I
+>$substring</I
+></TT
+> is a regular
+	    expression.</P
+><P
+>&#13;	  <TABLE
+BORDER="0"
+BGCOLOR="#E0E0E0"
+WIDTH="90%"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>   1&nbsp;stringZ=abcABC123ABCabc
+   2&nbsp;#       |------|
+   3&nbsp;
+   4&nbsp;echo `expr match "$stringZ" 'abc[A-Z]*.2'`   # 8
+   5&nbsp;echo `expr "$stringZ" : 'abc[A-Z]*.2'`       # 8</PRE
+></TD
+></TR
+></TABLE
+>
+          </P
+></DD
+></DL
+></DIV
+><DIV
+CLASS="VARIABLELIST"
+><P
+><B
+>Index</B
+></P
+><DL
+><DT
+>expr index $string $substring</DT
+><DD
+><P
+>Numerical position in $string of first character in 
+	    $substring that matches.</P
+><P
+><TABLE
+BORDER="0"
+BGCOLOR="#E0E0E0"
+WIDTH="90%"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>   1&nbsp;stringZ=abcABC123ABCabc
+   2&nbsp;echo `expr index "$stringZ" C12`             # 6
+   3&nbsp;                                             # C position.
+   4&nbsp;
+   5&nbsp;echo `expr index "$stringZ" 1c`              # 3
+   6&nbsp;# 'c' (in #3 position) matches before '1'.</PRE
+></TD
+></TR
+></TABLE
+></P
+><P
+>This is the near equivalent of
+            <I
+CLASS="EMPHASIS"
+>strchr()</I
+> in C.</P
+></DD
+></DL
+></DIV
+><DIV
+CLASS="VARIABLELIST"
+><P
+><B
+>Substring Extraction</B
+></P
+><DL
+><DT
+>${string:position}</DT
+><DD
+><P
+>Extracts substring from <TT
+CLASS="REPLACEABLE"
+><I
+>$string</I
+></TT
+> at
+	    <TT
+CLASS="REPLACEABLE"
+><I
+>$position</I
+></TT
+>.</P
+><P
+>If the <TT
+CLASS="VARNAME"
+>$string</TT
+> parameter is
+	    <SPAN
+CLASS="QUOTE"
+>"<SPAN
+CLASS="TOKEN"
+>*</SPAN
+>"</SPAN
+>
+	    or <SPAN
+CLASS="QUOTE"
+>"<SPAN
+CLASS="TOKEN"
+>@</SPAN
+>"</SPAN
+>, then this extracts the
+	    <A
+HREF="variables2.html#POSPARAMREF"
+>positional parameters</A
+>,
+	       <A
+NAME="AEN4559"
+HREF="#FTN.AEN4559"
+>[1]</A
+>
+	    starting at <TT
+CLASS="VARNAME"
+>$position</TT
+>.</P
+></DD
+><DT
+>${string:position:length}</DT
+><DD
+><P
+>Extracts <TT
+CLASS="REPLACEABLE"
+><I
+>$length</I
+></TT
+> characters
+	    of substring from <TT
+CLASS="REPLACEABLE"
+><I
+>$string</I
+></TT
+> at
+	    <TT
+CLASS="REPLACEABLE"
+><I
+>$position</I
+></TT
+>.</P
+><P
+>	  <TABLE
+BORDER="0"
+BGCOLOR="#E0E0E0"
+WIDTH="90%"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>   1&nbsp;stringZ=abcABC123ABCabc
+   2&nbsp;#       0123456789.....
+   3&nbsp;#       0-based indexing.
+   4&nbsp;
+   5&nbsp;echo ${stringZ:0}                            # abcABC123ABCabc
+   6&nbsp;echo ${stringZ:1}                            # bcABC123ABCabc
+   7&nbsp;echo ${stringZ:7}                            # 23ABCabc
+   8&nbsp;
+   9&nbsp;echo ${stringZ:7:3}                          # 23A
+  10&nbsp;                                             # Three characters of substring.
+  11&nbsp;
+  12&nbsp;
+  13&nbsp;
+  14&nbsp;# Is it possible to index from the right end of the string?
+  15&nbsp;    
+  16&nbsp;echo ${stringZ:-4}                           # abcABC123ABCabc
+  17&nbsp;# Defaults to full string, as in ${parameter:-default}.
+  18&nbsp;# However . . .
+  19&nbsp;
+  20&nbsp;echo ${stringZ:(-4)}                         # Cabc 
+  21&nbsp;echo ${stringZ: -4}                          # Cabc
+  22&nbsp;# Now, it works.
+  23&nbsp;# Parentheses or added space "escape" the position parameter.
+  24&nbsp;
+  25&nbsp;# Thank you, Dan Jacobson, for pointing this out.</PRE
+></TD
+></TR
+></TABLE
+>
+	  </P
+><P
+>If the <TT
+CLASS="VARNAME"
+>$string</TT
+> parameter is
+	    <SPAN
+CLASS="QUOTE"
+>"<SPAN
+CLASS="TOKEN"
+>*</SPAN
+>"</SPAN
+> or
+	    <SPAN
+CLASS="QUOTE"
+>"<SPAN
+CLASS="TOKEN"
+>@</SPAN
+>"</SPAN
+>, then this extracts a maximum
+	    of <TT
+CLASS="VARNAME"
+>$length</TT
+> positional parameters, starting
+	    at <TT
+CLASS="VARNAME"
+>$position</TT
+>.</P
+><P
+>	  <TABLE
+BORDER="0"
+BGCOLOR="#E0E0E0"
+WIDTH="90%"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>   1&nbsp;echo ${*:2}          # Echoes second and following positional parameters.
+   2&nbsp;echo ${@:2}          # Same as above.
+   3&nbsp;
+   4&nbsp;echo ${*:2:3}        # Echoes three positional parameters, starting at second.</PRE
+></TD
+></TR
+></TABLE
+>
+	  </P
+></DD
+><DT
+>expr substr $string $position $length</DT
+><DD
+><P
+>Extracts <TT
+CLASS="REPLACEABLE"
+><I
+>$length</I
+></TT
+> characters
+	    from <TT
+CLASS="REPLACEABLE"
+><I
+>$string</I
+></TT
+> starting at
+	    <TT
+CLASS="REPLACEABLE"
+><I
+>$position</I
+></TT
+>.</P
+><P
+>	  <TABLE
+BORDER="0"
+BGCOLOR="#E0E0E0"
+WIDTH="90%"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>   1&nbsp;stringZ=abcABC123ABCabc
+   2&nbsp;#       123456789......
+   3&nbsp;#       1-based indexing.
+   4&nbsp;
+   5&nbsp;echo `expr substr $stringZ 1 2`              # ab
+   6&nbsp;echo `expr substr $stringZ 4 3`              # ABC</PRE
+></TD
+></TR
+></TABLE
+>
+          </P
+><P
+><A
+NAME="EXPRPAREN"
+></A
+></P
+></DD
+><DT
+>expr match "$string" '\($substring\)'</DT
+><DD
+><P
+>Extracts <TT
+CLASS="REPLACEABLE"
+><I
+>$substring</I
+></TT
+>
+	    at beginning of <TT
+CLASS="REPLACEABLE"
+><I
+>$string</I
+></TT
+>,
+	    where <TT
+CLASS="REPLACEABLE"
+><I
+>$substring</I
+></TT
+> is a <A
+HREF="regexp.html#REGEXREF"
+>regular expression</A
+>.</P
+></DD
+><DT
+>expr "$string" : '\($substring\)'</DT
+><DD
+><P
+>Extracts <TT
+CLASS="REPLACEABLE"
+><I
+>$substring</I
+></TT
+>
+	    at beginning of <TT
+CLASS="REPLACEABLE"
+><I
+>$string</I
+></TT
+>,
+	    where <TT
+CLASS="REPLACEABLE"
+><I
+>$substring</I
+></TT
+> is a regular
+	    expression.</P
+><P
+>	    <TABLE
+BORDER="0"
+BGCOLOR="#E0E0E0"
+WIDTH="90%"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>   1&nbsp;stringZ=abcABC123ABCabc
+   2&nbsp;#       =======	    
+   3&nbsp;
+   4&nbsp;echo `expr match "$stringZ" '\(.[b-c]*[A-Z]..[0-9]\)'`   # abcABC1
+   5&nbsp;echo `expr "$stringZ" : '\(.[b-c]*[A-Z]..[0-9]\)'`       # abcABC1
+   6&nbsp;echo `expr "$stringZ" : '\(.......\)'`                   # abcABC1
+   7&nbsp;# All of the above forms give an identical result.</PRE
+></TD
+></TR
+></TABLE
+>
+	    </P
+></DD
+><DT
+>expr match "$string" '.*\($substring\)'</DT
+><DD
+><P
+>Extracts <TT
+CLASS="REPLACEABLE"
+><I
+>$substring</I
+></TT
+>
+	    at <I
+CLASS="EMPHASIS"
+>end</I
+> of
+	    <TT
+CLASS="REPLACEABLE"
+><I
+>$string</I
+></TT
+>, where
+	    <TT
+CLASS="REPLACEABLE"
+><I
+>$substring</I
+></TT
+> is a regular
+	    expression.</P
+></DD
+><DT
+>expr "$string" : '.*\($substring\)'</DT
+><DD
+><P
+>Extracts <TT
+CLASS="REPLACEABLE"
+><I
+>$substring</I
+></TT
+>
+	    at <I
+CLASS="EMPHASIS"
+>end</I
+> of <TT
+CLASS="REPLACEABLE"
+><I
+>$string</I
+></TT
+>,
+	    where <TT
+CLASS="REPLACEABLE"
+><I
+>$substring</I
+></TT
+> is a regular
+	    expression.</P
+><P
+>	    <TABLE
+BORDER="0"
+BGCOLOR="#E0E0E0"
+WIDTH="90%"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>   1&nbsp;stringZ=abcABC123ABCabc
+   2&nbsp;#                ======
+   3&nbsp;
+   4&nbsp;echo `expr match "$stringZ" '.*\([A-C][A-C][A-C][a-c]*\)'`    # ABCabc
+   5&nbsp;echo `expr "$stringZ" : '.*\(......\)'`                       # ABCabc</PRE
+></TD
+></TR
+></TABLE
+>
+
+	    </P
+></DD
+></DL
+></DIV
+><DIV
+CLASS="VARIABLELIST"
+><P
+><B
+>Substring Removal</B
+></P
+><DL
+><DT
+>${string#substring}</DT
+><DD
+><P
+>Strips shortest match of
+	    <TT
+CLASS="REPLACEABLE"
+><I
+>$substring</I
+></TT
+> from
+	    <I
+CLASS="EMPHASIS"
+>front</I
+> of
+	    <TT
+CLASS="REPLACEABLE"
+><I
+>$string</I
+></TT
+>.</P
+></DD
+><DT
+>${string##substring}</DT
+><DD
+><P
+>Strips longest match of
+	    <TT
+CLASS="REPLACEABLE"
+><I
+>$substring</I
+></TT
+> from
+	    <I
+CLASS="EMPHASIS"
+>front</I
+> of
+	    <TT
+CLASS="REPLACEABLE"
+><I
+>$string</I
+></TT
+>.</P
+><P
+>  
+	  <TABLE
+BORDER="0"
+BGCOLOR="#E0E0E0"
+WIDTH="90%"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>   1&nbsp;stringZ=abcABC123ABCabc
+   2&nbsp;#       |----|
+   3&nbsp;#       |----------|
+   4&nbsp;
+   5&nbsp;echo ${stringZ#a*C}      # 123ABCabc
+   6&nbsp;# Strip out shortest match between 'a' and 'C'.
+   7&nbsp;
+   8&nbsp;echo ${stringZ##a*C}     # abc
+   9&nbsp;# Strip out longest match between 'a' and 'C'.</PRE
+></TD
+></TR
+></TABLE
+>
+	  </P
+></DD
+><DT
+>${string%substring}</DT
+><DD
+><P
+>Strips shortest match of
+	    <TT
+CLASS="REPLACEABLE"
+><I
+>$substring</I
+></TT
+> from
+	    <I
+CLASS="EMPHASIS"
+>back</I
+> of
+	    <TT
+CLASS="REPLACEABLE"
+><I
+>$string</I
+></TT
+>.</P
+></DD
+><DT
+>${string%%substring}</DT
+><DD
+><P
+>Strips longest match of
+	    <TT
+CLASS="REPLACEABLE"
+><I
+>$substring</I
+></TT
+> from
+	    <I
+CLASS="EMPHASIS"
+>back</I
+> of
+	    <TT
+CLASS="REPLACEABLE"
+><I
+>$string</I
+></TT
+>.</P
+><P
+>  
+	  <TABLE
+BORDER="0"
+BGCOLOR="#E0E0E0"
+WIDTH="90%"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>   1&nbsp;stringZ=abcABC123ABCabc
+   2&nbsp;#                    ||
+   3&nbsp;#        |------------|
+   4&nbsp;
+   5&nbsp;echo ${stringZ%b*c}      # abcABC123ABCa
+   6&nbsp;# Strip out shortest match between 'b' and 'c', from back of $stringZ.
+   7&nbsp;
+   8&nbsp;echo ${stringZ%%b*c}     # a
+   9&nbsp;# Strip out longest match between 'b' and 'c', from back of $stringZ.</PRE
+></TD
+></TR
+></TABLE
+>
+	  </P
+><DIV
+CLASS="EXAMPLE"
+><HR><A
+NAME="CVT"
+></A
+><P
+><B
+>Example 9-11. Converting graphic file formats, with filename change</B
+></P
+><TABLE
+BORDER="0"
+BGCOLOR="#E0E0E0"
+WIDTH="90%"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>   1&nbsp;#!/bin/bash
+   2&nbsp;#  cvt.sh:
+   3&nbsp;#  Converts all the MacPaint image files in a directory to "pbm" format.
+   4&nbsp;
+   5&nbsp;#  Uses the "macptopbm" binary from the "netpbm" package,
+   6&nbsp;#+ which is maintained by Brian Henderson (bryanh@giraffe-data.com).
+   7&nbsp;#  Netpbm is a standard part of most Linux distros.
+   8&nbsp;
+   9&nbsp;OPERATION=macptopbm
+  10&nbsp;SUFFIX=pbm          # New filename suffix. 
+  11&nbsp;
+  12&nbsp;if [ -n "$1" ]
+  13&nbsp;then
+  14&nbsp;  directory=$1      # If directory name given as a script argument...
+  15&nbsp;else
+  16&nbsp;  directory=$PWD    # Otherwise use current working directory.
+  17&nbsp;fi  
+  18&nbsp;  
+  19&nbsp;#  Assumes all files in the target directory are MacPaint image files,
+  20&nbsp;#+ with a ".mac" filename suffix.
+  21&nbsp;
+  22&nbsp;for file in $directory/*    # Filename globbing.
+  23&nbsp;do
+  24&nbsp;  filename=${file%.*c}      #  Strip ".mac" suffix off filename
+  25&nbsp;                            #+ ('.*c' matches everything
+  26&nbsp;			    #+ between '.' and 'c', inclusive).
+  27&nbsp;  $OPERATION $file &#62; "$filename.$SUFFIX"
+  28&nbsp;                            # Redirect conversion to new filename.
+  29&nbsp;  rm -f $file               # Delete original files after converting.   
+  30&nbsp;  echo "$filename.$SUFFIX"  # Log what is happening to stdout.
+  31&nbsp;done
+  32&nbsp;
+  33&nbsp;exit 0
+  34&nbsp;
+  35&nbsp;# Exercise:
+  36&nbsp;# --------
+  37&nbsp;#  As it stands, this script converts *all* the files in the current
+  38&nbsp;#+ working directory.
+  39&nbsp;#  Modify it to work *only* on files with a ".mac" suffix.</PRE
+></TD
+></TR
+></TABLE
+><HR></DIV
+><P
+>A simple emulation of <A
+HREF="extmisc.html#GETOPTY"
+>getopt</A
+>
+	    using substring extraction constructs.</P
+><DIV
+CLASS="EXAMPLE"
+><HR><A
+NAME="GETOPTSIMPLE"
+></A
+><P
+><B
+>Example 9-12. Emulating <I
+CLASS="EMPHASIS"
+>getopt</I
+></B
+></P
+><TABLE
+BORDER="0"
+BGCOLOR="#E0E0E0"
+WIDTH="90%"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>   1&nbsp;#!/bin/bash
+   2&nbsp;# getopt-simple.sh
+   3&nbsp;# Author: Chris Morgan
+   4&nbsp;# Used in the ABS Guide with permission.
+   5&nbsp;
+   6&nbsp;
+   7&nbsp;getopt_simple()
+   8&nbsp;{
+   9&nbsp;    echo "getopt_simple()"
+  10&nbsp;    echo "Parameters are '$*'"
+  11&nbsp;    until [ -z "$1" ]
+  12&nbsp;    do
+  13&nbsp;      echo "Processing parameter of: '$1'"
+  14&nbsp;      if [ ${1:0:1} = '/' ]
+  15&nbsp;      then
+  16&nbsp;          tmp=${1:1}               # Strip off leading '/' . . .
+  17&nbsp;          parameter=${tmp%%=*}     # Extract name.
+  18&nbsp;          value=${tmp##*=}         # Extract value.
+  19&nbsp;          echo "Parameter: '$parameter', value: '$value'"
+  20&nbsp;          eval $parameter=$value
+  21&nbsp;      fi
+  22&nbsp;      shift
+  23&nbsp;    done
+  24&nbsp;}
+  25&nbsp;
+  26&nbsp;# Pass all options to getopt_simple().
+  27&nbsp;getopt_simple $*
+  28&nbsp;
+  29&nbsp;echo "test is '$test'"
+  30&nbsp;echo "test2 is '$test2'"
+  31&nbsp;
+  32&nbsp;exit 0
+  33&nbsp;
+  34&nbsp;---
+  35&nbsp;
+  36&nbsp;sh getopt_example.sh /test=value1 /test2=value2
+  37&nbsp;
+  38&nbsp;Parameters are '/test=value1 /test2=value2'
+  39&nbsp;Processing parameter of: '/test=value1'
+  40&nbsp;Parameter: 'test', value: 'value1'
+  41&nbsp;Processing parameter of: '/test2=value2'
+  42&nbsp;Parameter: 'test2', value: 'value2'
+  43&nbsp;test is 'value1'
+  44&nbsp;test2 is 'value2'</PRE
+></TD
+></TR
+></TABLE
+><HR></DIV
+></DD
+></DL
+></DIV
+><DIV
+CLASS="VARIABLELIST"
+><P
+><B
+>Substring Replacement</B
+></P
+><DL
+><DT
+>${string/substring/replacement}</DT
+><DD
+><P
+>Replace first match of
+	    <TT
+CLASS="REPLACEABLE"
+><I
+>$substring</I
+></TT
+> with
+	    <TT
+CLASS="REPLACEABLE"
+><I
+>$replacement</I
+></TT
+>.</P
+></DD
+><DT
+>${string//substring/replacement}</DT
+><DD
+><P
+>Replace all matches of
+	    <TT
+CLASS="REPLACEABLE"
+><I
+>$substring</I
+></TT
+> with
+	    <TT
+CLASS="REPLACEABLE"
+><I
+>$replacement</I
+></TT
+>.</P
+><P
+>  
+	  <TABLE
+BORDER="0"
+BGCOLOR="#E0E0E0"
+WIDTH="90%"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>   1&nbsp;stringZ=abcABC123ABCabc
+   2&nbsp;
+   3&nbsp;echo ${stringZ/abc/xyz}           # xyzABC123ABCabc
+   4&nbsp;                                  # Replaces first match of 'abc' with 'xyz'.
+   5&nbsp;
+   6&nbsp;echo ${stringZ//abc/xyz}          # xyzABC123ABCxyz
+   7&nbsp;                                  # Replaces all matches of 'abc' with # 'xyz'.</PRE
+></TD
+></TR
+></TABLE
+>
+	  </P
+></DD
+><DT
+>${string/#substring/replacement}</DT
+><DD
+><P
+>If <TT
+CLASS="REPLACEABLE"
+><I
+>$substring</I
+></TT
+> matches
+	    <I
+CLASS="EMPHASIS"
+>front</I
+> end of
+	    <TT
+CLASS="REPLACEABLE"
+><I
+>$string</I
+></TT
+>, substitute
+	    <TT
+CLASS="REPLACEABLE"
+><I
+>$replacement</I
+></TT
+> for
+	    <TT
+CLASS="REPLACEABLE"
+><I
+>$substring</I
+></TT
+>.</P
+></DD
+><DT
+>${string/%substring/replacement}</DT
+><DD
+><P
+>If <TT
+CLASS="REPLACEABLE"
+><I
+>$substring</I
+></TT
+> matches
+	    <I
+CLASS="EMPHASIS"
+>back</I
+> end of
+	    <TT
+CLASS="REPLACEABLE"
+><I
+>$string</I
+></TT
+>, substitute
+	    <TT
+CLASS="REPLACEABLE"
+><I
+>$replacement</I
+></TT
+> for
+	    <TT
+CLASS="REPLACEABLE"
+><I
+>$substring</I
+></TT
+>.</P
+><P
+>  
+          <TABLE
+BORDER="0"
+BGCOLOR="#E0E0E0"
+WIDTH="90%"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>   1&nbsp;stringZ=abcABC123ABCabc
+   2&nbsp;
+   3&nbsp;echo ${stringZ/#abc/XYZ}          # XYZABC123ABCabc
+   4&nbsp;                                  # Replaces front-end match of 'abc' with 'XYZ'.
+   5&nbsp;
+   6&nbsp;echo ${stringZ/%abc/XYZ}          # abcABC123ABCXYZ
+   7&nbsp;                                  # Replaces back-end match of 'abc' with 'XYZ'.</PRE
+></TD
+></TR
+></TABLE
+>
+	  </P
+></DD
+></DL
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="AWKSTRINGMANIP"
+>9.2.1. Manipulating strings using awk</A
+></H2
+><P
+>A Bash script may invoke the string manipulation facilities of
+	    <A
+HREF="awk.html#AWKREF"
+>awk</A
+> as an alternative to using its
+	    built-in operations.</P
+><DIV
+CLASS="EXAMPLE"
+><HR><A
+NAME="SUBSTRINGEX"
+></A
+><P
+><B
+>Example 9-13. Alternate ways of extracting substrings</B
+></P
+><TABLE
+BORDER="0"
+BGCOLOR="#E0E0E0"
+WIDTH="100%"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>   1&nbsp;#!/bin/bash
+   2&nbsp;# substring-extraction.sh
+   3&nbsp;
+   4&nbsp;String=23skidoo1
+   5&nbsp;#      012345678    Bash
+   6&nbsp;#      123456789    awk
+   7&nbsp;# Note different string indexing system:
+   8&nbsp;# Bash numbers first character of string as '0'.
+   9&nbsp;# Awk  numbers first character of string as '1'.
+  10&nbsp;
+  11&nbsp;echo ${String:2:4} # position 3 (0-1-2), 4 characters long
+  12&nbsp;                                         # skid
+  13&nbsp;
+  14&nbsp;# The awk equivalent of ${string:pos:length} is substr(string,pos,length).
+  15&nbsp;echo | awk '
+  16&nbsp;{ print substr("'"${String}"'",3,4)      # skid
+  17&nbsp;}
+  18&nbsp;'
+  19&nbsp;#  Piping an empty "echo" to awk gives it dummy input,
+  20&nbsp;#+ and thus makes it unnecessary to supply a filename.
+  21&nbsp;
+  22&nbsp;exit 0</PRE
+></TD
+></TR
+></TABLE
+><HR></DIV
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="STRFDISC"
+>9.2.2. Further Discussion</A
+></H2
+><P
+>For more on string manipulation in scripts, refer to <A
+HREF="parameter-substitution.html"
+>Section 9.3</A
+> and the
+       <A
+HREF="moreadv.html#EXPEXTRSUB"
+>relevant section</A
+> of the <A
+HREF="moreadv.html#EXPRREF"
+>expr</A
+> command listing. For script examples,
+       see: <OL
+TYPE="1"
+><LI
+><P
+><A
+HREF="moreadv.html#EX45"
+>Example 12-9</A
+></P
+></LI
+><LI
+><P
+><A
+HREF="parameter-substitution.html#LENGTH"
+>Example 9-16</A
+></P
+></LI
+><LI
+><P
+><A
+HREF="parameter-substitution.html#PATTMATCHING"
+>Example 9-17</A
+></P
+></LI
+><LI
+><P
+><A
+HREF="parameter-substitution.html#RFE"
+>Example 9-18</A
+></P
+></LI
+><LI
+><P
+><A
+HREF="parameter-substitution.html#VARMATCH"
+>Example 9-20</A
+></P
+></LI
+></OL
+>
+      </P
+></DIV
+></DIV
+><H3
+CLASS="FOOTNOTES"
+>Notes</H3
+><TABLE
+BORDER="0"
+CLASS="FOOTNOTES"
+WIDTH="100%"
+><TR
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+WIDTH="5%"
+><A
+NAME="FTN.AEN4559"
+HREF="string-manipulation.html#AEN4559"
+>[1]</A
+></TD
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+WIDTH="95%"
+><P
+>This applies to either command-line
+	       arguments or parameters passed to a <A
+HREF="functions.html#FUNCTIONREF"
+>function</A
+>.</P
+></TD
+></TR
+></TABLE
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="variables2.html"
+>Prev</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="index.html"
+>Home</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="parameter-substitution.html"
+>Next</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Variables Revisited</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="variables2.html"
+>Up</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Parameter Substitution</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>
