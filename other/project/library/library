@@ -1,0 +1,189 @@
+import tkinter as tk
+from tkinter import messagebox
+from tkinter import ttk
+from PIL import Image, ImageTk
+import winsound
+winsound.PlaySound("835d7c89356a150.wav",winsound.SND_FILENAME | winsound.SND_ASYNC)
+def load_books():
+    global lines
+    with open('library.txt', 'r', encoding='utf-8') as file:
+        read_lines = file.readlines()
+        lines = []
+        for line in read_lines:
+            stripped_line = line.strip()
+            if stripped_line:
+                lines.append(stripped_line)
+
+def save_books():
+    with open('library2.txt', 'w', encoding='utf-8') as file:
+        newline = []
+        for line in lines:
+            newline.append(line + '\n')
+        file.writelines(newline)
+def add_book():
+    name = name_entry.get().strip()
+    author = author_entry.get().strip()
+    try:
+        cnt_book = int(cnt_book_entry.get())
+        entry_line = f"{name}; {author}; {cnt_book}"
+        lines.append(entry_line)
+        save_books()
+        messagebox.showinfo("Успех", "Книга успешно добавлена.")
+        update_combobox()
+    except ValueError:
+        messagebox.showerror("Ошибка ввода", "Пожалуйста, введите корректные числовые значения.")
+def delete_book():
+    selected_book = book_combobox.get()
+    if selected_book:
+        entry_line = selected_book.strip()
+        if entry_line in lines:
+            lines.remove(entry_line)
+            save_books()
+            messagebox.showinfo("Успех", "Книга успешно удалена.")
+            update_combobox()
+        else:
+            messagebox.showerror("Ошибка", "Не удалось удалить книгу: книга не найдена в библиотеке.")
+def search():
+    name = name_entry.get().strip().lower()
+    author = author_entry.get().strip().lower()
+    if not name and not author:
+        messagebox.showerror("Ошибка ввода", "Пожалуйста, введите название книги или имя автора.")
+        return
+    found = False
+    for line in lines:
+        title, writer, cnt = line.strip().split(';')
+
+        if name and name in title.lower():
+            condition_title = True
+        else:
+            condition_title = False
+
+        if author and author in writer.lower():
+            condition_author = True
+        else:
+            condition_author = False
+
+        if condition_title or condition_author:
+            messagebox.showinfo("Результат поиска", f"Книга найдена: {line.strip()}")
+            found = True
+            break
+    if not found:
+        messagebox.showinfo("Результат поиска", "Книга не найдена.")
+
+
+def sell_book():
+    name = name_book_entry.get().strip()
+    author = author_book_entry.get().strip()
+    if not name:
+        messagebox.showerror("Ошибка", "Пожалуйста, введите название книги.")
+        return
+    if not author:
+        messagebox.showerror("Ошибка", "Пожалуйста, введите имя автора.")
+        return
+    try:
+        cnt = int(cnt_entry.get().strip())
+        if cnt <= 0:
+            messagebox.showerror("Ошибка", "Количество книг должно быть больше 0.")
+            return
+        found = False
+        for i, line in enumerate(lines):
+            title, writer, quantity = line.strip().split(';')
+            quantity = int(quantity)
+            if title == name or writer == author:
+                found = True
+                if cnt > quantity:
+                    messagebox.showinfo("Ошибка покупки",
+                                        f"Книга найдена: {line.strip()}\nКоличество книг в библиотеке: {quantity}\nВ библиотеке нехватает книг, прошу прощения.")
+                else:
+                    new_quantity = quantity - cnt
+                    lines[i] = f"{title};{writer};{new_quantity}"
+                    messagebox.showinfo("Покупка",
+                                        f"Книга найдена: {line.strip()}\nКоличество книг в библиотеке: {quantity}\nКуплено: {cnt}")
+                    update_combobox()
+                break
+        if not found:
+            messagebox.showinfo("Ошибка", "Книга не найдена в библиотеке.")
+
+    except ValueError:
+        messagebox.showerror("Ошибка", "Введите корректное количество книг.")
+
+
+def finish():
+    root.destroy()
+    print("Спасибо за то, что воспользовались нашей программой")
+
+def update_combobox():
+    book_combobox['values'] = lines
+
+lines = []
+load_books()
+
+root = tk.Tk()
+root.title("Книжный магазин")
+root.protocol("WM_DELETE_WINDOW", finish)
+root.configure(bg='lightblue')
+root.iconbitmap("C:/Users/~Darr_Kness~/Downloads/images-_3_.ico")
+canvas = tk.Canvas(root, width=800, height=600, bg='lightblue')
+canvas.pack()
+
+image1 = Image.open("C:/Users/~Darr_Kness~/Downloads/Samizdat.jpg")
+image1 = image1.resize((750, 560))
+photo1 = ImageTk.PhotoImage(image1)
+canvas.create_image(25, 25, anchor=tk.NW, image=photo1)
+
+add_label = tk.Label(root, text="Книжный магазин: -Милый Дом-", font=("Arial", 20), bg='lightblue')
+canvas.create_window(250, 50, window=add_label)
+
+name_label = tk.Label(root, text="Введите название:", font=("Arial", 16), bg='lightblue')
+canvas.create_window(140, 100, window=name_label)
+name_entry = tk.Entry(root, font=("Arial", 16))
+canvas.create_window(450, 100, window=name_entry)
+
+author_label = tk.Label(root, text="Введите Автора:", font=("Arial", 16), bg='lightblue')
+canvas.create_window(130, 150, window=author_label)
+author_entry = tk.Entry(root, font=("Arial", 16))
+canvas.create_window(450, 150, window=author_entry)
+
+cnt_book_label = tk.Label(root, text="Введите количество книг:", font=("Arial", 16), bg='lightblue')
+canvas.create_window(173, 200, window=cnt_book_label)
+cnt_book_entry = tk.Entry(root, font=("Arial", 16))
+canvas.create_window(450, 200, window=cnt_book_entry)
+sell_label = tk.Label(root, text="Купить книгу", font=("Arial", 16), bg='lightblue')
+canvas.create_window(112, 400, window=sell_label)
+
+cnt_label = tk.Label(root, text="Количество книг: ", font=("Arial", 16), bg='lightblue')
+canvas.create_window(135, 450, window=cnt_label)
+cnt_entry = tk.Entry(root, font=("Arial", 16))
+canvas.create_window(420, 450, window=cnt_entry)
+
+author_book_label = tk.Label(root, text="Введите автора:", font=("Arial", 16), bg='lightblue')
+canvas.create_window(131, 500, window=author_book_label)
+author_book_entry = tk.Entry(root, font=("Arial", 16))
+canvas.create_window(420, 500, window=author_book_entry)
+
+name_book_label = tk.Label(root, text="Введите название книги:", font=("Arial", 16), bg='lightblue')
+canvas.create_window(170, 550, window=name_book_label)
+name_book_entry = tk.Entry(root, font=("Arial", 16))
+canvas.create_window(420, 550, window=name_book_entry)
+
+katalog_combobox = tk.Label(root, text= "Каталог книг в библиотеке:", font =("Arial", 16), bg = "lightblue")
+canvas.create_window(180, 250,window=katalog_combobox)
+
+book_combobox = ttk.Combobox(root, font=("Arial", 16))
+book_combobox.set("Выберите книгу")
+update_combobox()
+canvas.create_window(460, 250, window=book_combobox)
+
+add_button = tk.Button(root, text="Добавить книгу", command=add_book, font=("Arial", 16), bg='lightblue')
+canvas.create_window(300, 300, window=add_button)
+
+sell_button = tk.Button(root, text="Купить книгу.", command=sell_book, font=("Arial", 16), bg='lightblue')
+canvas.create_window(650, 550, window=sell_button)
+
+delete_button = tk.Button(root, text="Удалить", command=delete_book, font=("Arial", 16), bg='lightblue')
+canvas.create_window(500, 300, window=delete_button)
+
+search_button = tk.Button(root, text="Искать", command=search, font=("Arial", 16), bg='lightblue')
+canvas.create_window(400, 350, window=search_button)
+
+root.mainloop()
