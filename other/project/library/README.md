@@ -25,6 +25,7 @@
 
 ## Узнайте больше о библиотеке tkinter
 [Wiki](https://en.wikipedia.org/wiki/Tkinter)
+
 [Wiki](https://ru.wikipedia.org/wiki/Tkinter)
 
 ## Поддержка библиотеки Tkinter
@@ -61,6 +62,7 @@ Choose the method that is convenient for you and follow the instructions to laun
 ## Learn more about the tkinter library
 
 [Wiki](https://en.wikipedia.org/wiki/Tkinter)
+
 [Wiki](https://ru.wikipedia.org/wiki/Tkinter)
 
 ## Tkinter library support
