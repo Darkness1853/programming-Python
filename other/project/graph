@@ -1,0 +1,52 @@
+import matplotlib.pyplot as plt
+import numpy as np
+
+# размер матрицы: {потоки: время в мс}
+data = {
+    0: {1: 0, 2: 0, 4: 0, 8: 0, 16: 0},
+    200: {1: 24.709, 2: 26.209, 4: 24.95, 8: 23.743, 16: 24.728},
+    400: {1: 248.587, 2: 388.345, 4: 288.654, 8: 371.39, 16: 381.045},
+    800: {1: 2261.977, 2: 2532.219, 4: 2564.175, 8: 3382.194, 16: 3827.952},
+    1600: {1: 20697.275, 2: 21563.516, 4: 24076.993, 8: 29111.237, 16: 42238.088},
+    2000: {1: 44454.164, 2: 46987.596, 4: 49248.516, 8: 61833.375, 16: 88706.191}
+}
+
+colors = plt.cm.viridis(np.linspace(0, 1, len(data[200])))
+thread_colors = {t: colors[i] for i, t in enumerate(sorted(data[200].keys()))}
+
+plt.figure(figsize=(12, 8))
+
+for thread in sorted(data[200].keys()):
+    sizes = []
+    times = []
+    for size in sorted(data.keys()):
+        sizes.append(size)
+        times.append(data[size][thread])
+    plt.plot(sizes, times,
+             label=f'{thread} потоков',
+             linewidth=2.5,
+             color=thread_colors[thread])
+
+plt.title('Зависимость времени выполнения от размера матрицы\nи количества потоков',
+          fontsize=14, pad=20)
+plt.xlabel('Размер матрицы (N×N)', fontsize=12)
+plt.ylabel('Время выполнения (мс)', fontsize=12)
+
+plt.xticks(sorted(data.keys()), labels=[str(s) for s in sorted(data.keys())])
+plt.yticks(
+    [0, 10000, 20000, 30000, 40000, 50000, 60000, 70000, 80000, 90000],
+    labels=['0', '10', '20', '30', '40', '50', '60', '70', '80', '90']
+)
+plt.ylim(0, 90000)
+
+plt.xlim(left=0)
+plt.ylim(bottom=0)
+
+plt.grid(True, which="both", ls="--", alpha=0.5)
+plt.legend(title='Количество потоков',
+           bbox_to_anchor=(1.05, 1),
+           loc='upper left',
+           fontsize=10)
+
+plt.tight_layout()
+plt.show()
